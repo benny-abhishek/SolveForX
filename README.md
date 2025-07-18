@@ -1,168 +1,215 @@
-# CatCompanion
+# Smart Operator Management System
 
-A comprehensive monitoring and management system with a React frontend and Django backend, featuring real-time safety monitoring, daily task management, and critical alert systems.
+A comprehensive heavy equipment operator management system built with Flask, featuring real-time safety monitoring, task management, training tracking, and incident reporting for construction and mining operations.
 
 ## 🚀 Features
 
-- **Real-time Safety Monitoring**: Monitor system safety metrics and alerts
-- **Daily Task Management**: Track and manage daily operational tasks
-- **Critical Alert System**: Real-time notifications for critical system events
-- **Dashboard Overview**: Comprehensive system overview and analytics
-- **Modern UI**: Clean, responsive interface built with React and TypeScript
-- **GraphQL API**: Efficient data fetching and mutations
-- **Django Backend**: Robust backend with Django REST framework
+- **Real-time Safety Monitoring**: Monitor equipment safety metrics including seatbelt status, proximity alerts, and engine conditions
+- **Operator Management**: Track operator certifications, assignments, and performance metrics
+- **Task Management**: Create, assign, and track daily operational tasks with priority levels
+- **Training Hub**: Manage operator training records, course assignments, and certification tracking
+- **Incident Reporting**: Record and track safety incidents with severity classification
+- **Role-based Access**: Separate dashboards for operators, managers, and administrators
+- **Equipment Tracking**: Monitor machine status, location, and operational data
+- **Reporting & Analytics**: Comprehensive reporting on safety metrics, task completion, and training progress
 
 ## 🏗️ Project Structure
 
 ```
 SolveForX/
-├── backend/                 # Django backend application
-│   └── catcompanion/       # Main Django project
-│       ├── cat_operator/   # Cat operator management app
-│       ├── machine_logs/   # Machine logging and monitoring
-│       ├── manage.py       # Django management script
-│       └── requirements.txt # Python dependencies
-├── frontend/               # React frontend application
-│   ├── src/
-│   │   ├── components/     # React components
-│   │   ├── graphql/        # GraphQL queries and mutations
-│   │   └── types/          # TypeScript type definitions
-│   ├── package.json        # Node.js dependencies
-│   └── tsconfig.json       # TypeScript configuration
-└── README.md              # This file
+├── app.py                 # Flask application configuration and setup
+├── main.py               # Application entry point
+├── models.py             # SQLAlchemy database models
+├── routes.py             # Flask route handlers and views
+├── data_processor.py     # Sample data initialization and data processing
+├── pyproject.toml        # Python dependencies and project configuration
+├── uv.lock              # Dependency lock file
+├── sample_data.csv      # Sample data for testing
+├── cat-logo.jpeg        # Application logo
+├── instance/            # Database files (SQLite)
+│   └── smart_operator.db
+├── static/              # Static assets
+│   ├── css/
+│   │   └── style.css    # Main stylesheet
+│   └── js/
+│       └── dashboard.js # Dashboard JavaScript functionality
+└── templates/           # HTML templates
+    ├── base.html        # Base template with navigation
+    ├── index.html       # Landing page with login
+    ├── dashboard.html   # General dashboard
+    ├── manager_dashboard.html    # Manager-specific dashboard
+    ├── operator_dashboard.html   # Operator-specific dashboard
+    ├── tasks.html       # Task management interface
+    ├── create_task.html # Task creation form
+    ├── training.html    # Training management interface
+    └── reports.html     # Reporting and analytics
 ```
 
 ## 🛠️ Technology Stack
 
-### Frontend
-- **React 18** with TypeScript
-- **GraphQL** for API communication
-- **CSS Modules** for styling
-- **Modern ES6+** JavaScript
-
 ### Backend
-- **Django 4.x** with Python
-- **Django REST Framework** for API endpoints
-- **GraphQL** support
-- **PostgreSQL** (recommended database)
+- **Flask 3.1.1** - Web framework
+- **SQLAlchemy 3.1.1** - Database ORM
+- **Flask-Login 0.6.3** - User authentication
+- **SQLite/PostgreSQL** - Database (SQLite for development, PostgreSQL for production)
+- **Gunicorn 23.0.0** - WSGI server for production
+
+### Frontend
+- **HTML5** with Jinja2 templating
+- **CSS3** with modern responsive design
+- **JavaScript** for interactive dashboard features
+- **Bootstrap** (included in templates) for UI components
+
+### Database Models
+- **User** - Authentication and role management
+- **Operator** - Equipment operator profiles
+- **Machine** - Heavy equipment tracking
+- **SensorData** - Real-time equipment monitoring data
+- **Task** - Work task management
+- **SafetyIncident** - Safety incident reporting
+- **TrainingRecord** - Operator training and certification tracking
 
 ## 📋 Prerequisites
 
 Before running this project, make sure you have the following installed:
 
-- **Node.js** (v16 or higher)
-- **Python** (v3.8 or higher)
+- **Python 3.11 or higher**
 - **pip** (Python package manager)
-- **npm** or **yarn** (Node.js package manager)
+- **uv** (recommended for dependency management)
 
 ## 🚀 Getting Started
 
-### Backend Setup
-
-1. **Navigate to the backend directory:**
-   ```bash
-   cd backend/catcompanion
-   ```
-
-2. **Create and activate a virtual environment:**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. **Install Python dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Set up the database:**
-   ```bash
-   python manage.py migrate
-   ```
-
-5. **Create a superuser (optional):**
-   ```bash
-   python manage.py createsuperuser
-   ```
-
-6. **Run the development server:**
-   ```bash
-   python manage.py runserver
-   ```
-
-The Django backend will be available at `http://localhost:8000`
-
-### Frontend Setup
-
-1. **Navigate to the frontend directory:**
-   ```bash
-   cd frontend
-   ```
-
-2. **Install Node.js dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Start the development server:**
-   ```bash
-   npm start
-   ```
-
-The React frontend will be available at `http://localhost:3000`
-
-## 📁 Key Components
-
-### Frontend Components
-
-- **Dashboard**: Main application interface with tab navigation
-- **OverviewTab**: System overview and key metrics
-- **SafetyMonitorTab**: Real-time safety monitoring interface
-- **DailyTasksTab**: Daily task management and tracking
-- **CriticalAlert**: Critical alert display and management
-- **Header**: Application header with navigation
-- **TabNavigation**: Tab-based navigation system
-
-### Backend Apps
-
-- **cat_operator**: Cat operator management and operations
-- **machine_logs**: Machine logging, monitoring, and analytics
-
-## 🔧 Configuration
-
-### Environment Variables
-
-Create a `.env` file in the backend directory with the following variables:
-
-```env
-DEBUG=True
-SECRET_KEY=your-secret-key-here
-DATABASE_URL=postgresql://user:password@localhost:5432/solveforx
-ALLOWED_HOSTS=localhost,127.0.0.1
+### 1. Clone the Repository
+```bash
+git clone <repository-url>
+cd SolveForX
 ```
 
-### Django Settings
+### 2. Install Dependencies
+Using uv (recommended):
+```bash
+uv sync
+```
 
-Copy `settings_example.py` to `settings.py` and configure according to your environment.
+Or using pip:
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Set Environment Variables
+Create a `.env` file in the project root:
+```env
+FLASK_APP=app.py
+FLASK_ENV=development
+DATABASE_URL=sqlite:///instance/smart_operator.db
+SESSION_SECRET=your-secret-key-here
+```
+
+### 4. Initialize the Database
+The application will automatically create the database and populate it with sample data on first run.
+
+### 5. Run the Application
+```bash
+python main.py
+```
+
+The application will be available at `http://localhost:5001`
+
+## 👥 User Roles & Access
+
+### Operator
+- View personal dashboard with assigned tasks
+- Track training progress and certifications
+- View safety alerts and incidents
+- Update task status and completion
+
+### Manager
+- Overview of all operators and equipment
+- Create and assign tasks
+- Monitor safety metrics and incidents
+- Access comprehensive reporting
+- Manage training assignments
+
+
+
+## 🔐 Default Login Credentials
+
+The system comes with sample users for testing:
+
+### Operators
+- Username: `john.smith` / Password: `operator123`
+- Username: `maria.garcia` / Password: `operator123`
+- Username: `david.johnson` / Password: `operator123`
+- Username: `sarah.wilson` / Password: `operator123`
+
+### Managers
+- Username: `manager` / Password: `manager123`
+- Username: `supervisor` / Password: `manager123`
+
+## 📊 Key Features Explained
+
+### Safety Monitoring
+- **Real-time Alerts**: Monitor seatbelt status, proximity warnings, and engine conditions
+- **Incident Tracking**: Record and classify safety incidents by severity
+- **Safety Score**: Calculate overall safety performance metrics
+
+### Task Management
+- **Priority Levels**: High, Medium, Low priority classification
+- **Status Tracking**: Pending, In Progress, Completed states
+- **Duration Tracking**: Estimated vs actual completion times
+- **Assignment System**: Managers can assign tasks to specific operators
+
+### Training Management
+- **Course Types**: Safety, Technical, and Certification training
+- **Progress Tracking**: Monitor completion status and scores
+- **Due Date Management**: Track overdue and upcoming training requirements
+- **Certification Levels**: Basic, Intermediate, Advanced operator levels
+
+### Equipment Management
+- **Machine Tracking**: Monitor equipment status and location
+- **Sensor Data**: Real-time monitoring of engine hours, fuel usage, and operational metrics
+- **Operator Assignment**: Link operators to specific equipment
 
 ## 🧪 Testing
 
-### Backend Tests
+### Run the Application
 ```bash
-cd backend/catcompanion
-python manage.py test
+python main.py
 ```
 
-### Frontend Tests
-```bash
-cd frontend
-npm test
+### Access Different Dashboards
+1. **Operator Dashboard**: Login as any operator user
+2. **Manager Dashboard**: Login as manager or admin user
+3. **Task Management**: Access via `/tasks` route
+4. **Training Hub**: Access via `/training` route
+5. **Reports**: Access via `/reports` route
+
+## 🔧 Configuration
+
+### Database Configuration
+The application supports both SQLite (development) and PostgreSQL (production):
+
+```python
+# Development (SQLite)
+DATABASE_URL=sqlite:///instance/smart_operator.db
+
+# Production (PostgreSQL)
+DATABASE_URL=postgresql://user:password@localhost:5432/smart_operator
 ```
 
-## 📊 API Documentation
+### Security Configuration
+- Change the `SESSION_SECRET` environment variable in production
+- Use HTTPS in production environments
+- Configure proper database credentials
 
-The project uses GraphQL for API communication. You can explore the GraphQL schema at:
-- **GraphQL Playground**: `http://localhost:8000/graphql/` (when backend is running)
+## 📈 Sample Data
+
+The application includes comprehensive sample data:
+- 4 heavy equipment machines (excavators and loaders)
+- 4 operators with different certification levels
+- 30 days of sensor data with realistic operational metrics
+- Sample tasks, incidents, and training records
+- Multiple user accounts for testing different roles
 
 ## 🤝 Contributing
 
@@ -193,4 +240,4 @@ Stay updated with the latest changes by:
 
 ---
 
-**Built with ❤️ for efficient system monitoring and management**
+**Built with ❤️ for efficient heavy equipment operator management and safety monitoring**
