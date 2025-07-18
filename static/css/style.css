@@ -1,0 +1,868 @@
+/* Caterpillar Smart Operator Assistant - Authentic CAT Industrial Theme */
+
+:root {
+    /* Authentic Caterpillar Colors */
+    --cat-yellow: #FFCD11;
+    --cat-dark-yellow: #F0B800;
+    --cat-orange: #FF6900;
+    --cat-black: #000000;
+    --cat-dark-gray: #1C1C1C;
+    --cat-medium-gray: #2D2D2D;
+    --cat-light-gray: #3D3D3D;
+    --cat-text-gray: #CCCCCC;
+    --safety-red: #E31E24;
+    --safety-green: #00A651;
+    --warning-orange: #FF6900;
+    --industrial-blue: #004C97;
+    
+    /* Design System */
+    --border-radius: 8px;
+    --border-radius-lg: 12px;
+    --transition: all 0.3s ease;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.4);
+    --text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Global Styles - Industrial Theme */
+body {
+    font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+    background: linear-gradient(135deg, var(--cat-dark-gray) 0%, var(--cat-black) 100%);
+    background-attachment: fixed;
+    color: white;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* Industrial Background Pattern */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 2px,
+            rgba(255, 205, 17, 0.02) 2px,
+            rgba(255, 205, 17, 0.02) 4px
+        );
+    z-index: -1;
+    pointer-events: none;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 25% 25%, rgba(255, 205, 17, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(255, 105, 0, 0.05) 0%, transparent 50%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+.container-fluid {
+    max-width: 1400px;
+    padding: 0 2rem;
+}
+
+/* CAT Navigation */
+.navbar {
+    background: linear-gradient(135deg, var(--cat-black) 0%, var(--cat-dark-gray) 100%) !important;
+    border-bottom: 3px solid var(--cat-yellow);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+.navbar-dark .navbar-brand {
+    font-weight: 900;
+    font-size: 1.6rem;
+    color: var(--cat-yellow) !important;
+    text-shadow: var(--text-shadow);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    font-weight: 600;
+    padding: 0.75rem 1.25rem;
+    transition: var(--transition);
+    border-radius: var(--border-radius);
+    margin: 0 4px;
+    color: var(--cat-text-gray) !important;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.navbar-dark .navbar-nav .nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--cat-yellow), transparent);
+    transition: left 0.6s;
+    opacity: 0.2;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover::before {
+    left: 100%;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+    background: rgba(255, 205, 17, 0.1);
+    color: var(--cat-yellow) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 205, 17, 0.3);
+}
+
+.navbar-dark .navbar-nav .nav-link.active {
+    background: linear-gradient(135deg, var(--cat-yellow) 0%, var(--cat-dark-yellow) 100%);
+    color: var(--cat-black) !important;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(255, 205, 17, 0.5);
+}
+
+/* CAT Industrial Stat Cards */
+.stat-card {
+    background: linear-gradient(135deg, var(--cat-medium-gray) 0%, var(--cat-light-gray) 100%);
+    border: 2px solid var(--cat-light-gray);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    overflow: hidden;
+    position: relative;
+    border-left: 6px solid var(--cat-yellow);
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, var(--cat-yellow) 0%, var(--cat-orange) 100%);
+    opacity: 0.1;
+    clip-path: polygon(70% 0%, 100% 0%, 100% 70%);
+}
+
+.stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-hover);
+    border-left-color: var(--cat-orange);
+}
+
+.stat-card .card-body {
+    padding: 2rem;
+    position: relative;
+    z-index: 2;
+}
+
+.stat-card .stat-icon {
+    font-size: 3rem;
+    opacity: 0.3;
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--cat-yellow);
+    transition: var(--transition);
+}
+
+.stat-card:hover .stat-icon {
+    opacity: 0.5;
+    transform: translateY(-50%) scale(1.1);
+    color: var(--cat-orange);
+}
+
+.stat-card h2 {
+    font-size: 2.8rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    color: var(--cat-yellow);
+    text-shadow: var(--text-shadow);
+}
+
+.stat-card h4 {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 1rem;
+}
+
+.stat-card small {
+    color: var(--cat-text-gray);
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+}
+
+/* CAT Gradient Backgrounds */
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--industrial-blue) 0%, #003875 100%);
+}
+
+.bg-gradient-success {
+    background: linear-gradient(135deg, var(--safety-green) 0%, #008A43 100%);
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(135deg, var(--cat-yellow) 0%, var(--cat-orange) 100%);
+}
+
+.bg-gradient-info {
+    background: linear-gradient(135deg, var(--industrial-blue) 0%, var(--cat-yellow) 100%);
+}
+
+.bg-gradient-danger {
+    background: linear-gradient(135deg, var(--safety-red) 0%, #C71E20 100%);
+}
+
+/* Industrial Card Styles */
+.card {
+    background: linear-gradient(135deg, var(--cat-medium-gray) 0%, var(--cat-light-gray) 100%);
+    border: 2px solid var(--cat-light-gray);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+    transition: var(--transition);
+    overflow: hidden;
+    position: relative;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--cat-yellow) 0%, var(--cat-orange) 100%);
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--cat-yellow);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--cat-black) 0%, var(--cat-dark-gray) 100%);
+    border-bottom: 2px solid var(--cat-yellow);
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0 !important;
+    font-weight: 700;
+    padding: 1.5rem 2rem;
+    color: var(--cat-yellow);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+}
+
+.card-header h5 {
+    margin: 0;
+    font-size: 1.1rem;
+    text-shadow: var(--text-shadow);
+}
+
+.card-body {
+    padding: 2rem;
+    color: var(--cat-text-gray);
+    background: linear-gradient(135deg, var(--cat-medium-gray) 0%, var(--cat-light-gray) 100%);
+}
+
+/* CAT Safety Alert Cards */
+.safety-alert-item {
+    background: linear-gradient(135deg, var(--cat-light-gray) 0%, var(--cat-medium-gray) 100%);
+    border: 2px solid var(--warning-orange);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.safety-alert-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background: linear-gradient(180deg, var(--warning-orange) 0%, var(--safety-red) 100%);
+}
+
+.safety-alert-item:hover {
+    transform: translateX(8px);
+    box-shadow: 0 6px 20px rgba(255, 105, 0, 0.3);
+    border-color: var(--safety-red);
+}
+
+.safety-alert-item .machine-id {
+    font-weight: 900;
+    color: var(--cat-yellow);
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: var(--text-shadow);
+}
+
+.safety-alert-item .alert-message {
+    color: var(--warning-orange);
+    font-weight: 600;
+    margin: 0.75rem 0;
+    display: flex;
+    align-items: center;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+
+.safety-alert-item .alert-message i {
+    margin-right: 0.75rem;
+    font-size: 1.2rem;
+    color: var(--safety-red);
+}
+
+.safety-alert-item .timestamp {
+    color: var(--cat-text-gray);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* CAT Task Cards */
+.task-item {
+    background: linear-gradient(135deg, var(--cat-light-gray) 0%, var(--cat-medium-gray) 100%);
+    border: 2px solid var(--cat-light-gray);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.task-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background: var(--cat-text-gray);
+}
+
+.task-item.priority-high::before {
+    background: linear-gradient(180deg, var(--safety-red) 0%, #C71E20 100%);
+}
+
+.task-item.priority-medium::before {
+    background: linear-gradient(180deg, var(--cat-yellow) 0%, var(--cat-orange) 100%);
+}
+
+.task-item.priority-low::before {
+    background: linear-gradient(180deg, var(--safety-green) 0%, #008A43 100%);
+}
+
+.task-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    border-color: var(--cat-yellow);
+}
+
+.task-item .task-title {
+    font-weight: 900;
+    color: var(--cat-yellow);
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-shadow: var(--text-shadow);
+}
+
+.task-item .task-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.task-item .task-machine {
+    color: var(--cat-text-gray);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.task-item .task-duration {
+    background: linear-gradient(135deg, var(--cat-black) 0%, var(--cat-dark-gray) 100%);
+    color: var(--cat-yellow);
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid var(--cat-yellow);
+}
+
+/* CAT Status Badges */
+.badge {
+    font-weight: 900;
+    padding: 0.7em 1.4em;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    border: 2px solid transparent;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.badge.bg-warning {
+    background: linear-gradient(135deg, var(--cat-yellow) 0%, var(--cat-orange) 100%) !important;
+    color: var(--cat-black) !important;
+    border-color: var(--cat-orange);
+}
+
+.badge.bg-success {
+    background: linear-gradient(135deg, var(--safety-green) 0%, #008A43 100%) !important;
+    color: white !important;
+    border-color: var(--safety-green);
+}
+
+.badge.bg-danger {
+    background: linear-gradient(135deg, var(--safety-red) 0%, #C71E20 100%) !important;
+    color: white !important;
+    border-color: var(--safety-red);
+}
+
+.badge.bg-secondary {
+    background: linear-gradient(135deg, var(--cat-light-gray) 0%, var(--cat-medium-gray) 100%) !important;
+    color: var(--cat-text-gray) !important;
+    border-color: var(--cat-light-gray);
+}
+
+/* CAT Quick Actions */
+.quick-action-btn {
+    background: linear-gradient(135deg, var(--cat-light-gray) 0%, var(--cat-medium-gray) 100%);
+    border: 3px solid transparent;
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    transition: var(--transition);
+    text-decoration: none;
+    color: var(--cat-text-gray);
+    display: block;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    cursor: pointer;
+    width: 100%;
+}
+
+.quick-action-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 205, 17, 0.3), transparent);
+    transition: left 0.6s;
+}
+
+.quick-action-btn:hover::before {
+    left: 100%;
+}
+
+.quick-action-btn:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    color: var(--cat-text-gray);
+    text-decoration: none;
+    border-color: var(--cat-yellow);
+}
+
+.quick-action-btn.safety {
+    border-color: var(--safety-green);
+}
+
+.quick-action-btn.safety:hover {
+    border-color: var(--safety-green);
+    box-shadow: 0 12px 32px rgba(0, 166, 81, 0.3);
+}
+
+.quick-action-btn.tasks {
+    border-color: var(--cat-yellow);
+}
+
+.quick-action-btn.tasks:hover {
+    border-color: var(--cat-yellow);
+    box-shadow: 0 12px 32px rgba(255, 205, 17, 0.3);
+}
+
+.quick-action-btn.reports {
+    border-color: var(--industrial-blue);
+}
+
+.quick-action-btn.reports:hover {
+    border-color: var(--industrial-blue);
+    box-shadow: 0 12px 32px rgba(0, 76, 151, 0.3);
+}
+
+.quick-action-btn.incident {
+    border-color: var(--safety-red);
+}
+
+.quick-action-btn.incident:hover {
+    border-color: var(--safety-red);
+    box-shadow: 0 12px 32px rgba(227, 30, 36, 0.3);
+}
+
+.quick-action-btn i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    display: block;
+    color: var(--cat-yellow);
+}
+
+.quick-action-btn .action-title {
+    font-weight: 900;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: var(--cat-yellow);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-shadow: var(--text-shadow);
+}
+
+.quick-action-btn .action-subtitle {
+    color: var(--cat-text-gray);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* CAT Empty States */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--cat-text-gray);
+}
+
+.empty-state i {
+    font-size: 5rem;
+    margin-bottom: 1.5rem;
+    color: var(--cat-yellow);
+    opacity: 0.6;
+}
+
+.empty-state h6 {
+    font-weight: 900;
+    margin-bottom: 0.75rem;
+    color: var(--cat-yellow);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1.2rem;
+    text-shadow: var(--text-shadow);
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--cat-text-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+/* CAT Tables */
+.table {
+    color: var(--cat-text-gray);
+    background: transparent;
+    font-size: 0.95rem;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table th {
+    border-top: none;
+    border-bottom: 3px solid var(--cat-yellow);
+    font-weight: 900;
+    color: var(--cat-yellow);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 1.25rem 1rem;
+    background: linear-gradient(135deg, var(--cat-black) 0%, var(--cat-dark-gray) 100%);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    position: relative;
+}
+
+.table th::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--cat-orange) 0%, var(--cat-yellow) 50%, var(--cat-orange) 100%);
+}
+
+.table td {
+    border-color: rgba(255, 205, 17, 0.2);
+    padding: 1.25rem 1rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(255, 205, 17, 0.15);
+}
+
+.table-hover tbody tr {
+    transition: all 0.3s ease;
+    border-radius: var(--border-radius);
+}
+
+.table-hover tbody tr:hover {
+    background: linear-gradient(135deg, rgba(255, 205, 17, 0.15) 0%, rgba(255, 105, 0, 0.1) 100%);
+    color: var(--cat-yellow);
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(255, 205, 17, 0.2);
+}
+
+/* Enhanced Safety Incidents Table */
+.card-header.bg-warning {
+    background: linear-gradient(135deg, var(--warning-orange) 0%, var(--cat-yellow) 100%) !important;
+    color: var(--cat-black) !important;
+    font-weight: 900;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    border-bottom: 3px solid var(--cat-orange);
+}
+
+.card-header.bg-warning h5 {
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.card-header.bg-warning i {
+    margin-right: 0.75rem;
+    font-size: 1.3rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Specific styling for safety incidents table cells */
+.table tbody tr td:first-child {
+    font-weight: 700;
+    color: var(--cat-yellow);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.5px;
+}
+
+.table tbody tr td:nth-child(2) {
+    font-weight: 900;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1rem;
+}
+
+.table tbody tr td:nth-child(3) {
+    color: var(--cat-text-gray);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table tbody tr td:nth-child(4) {
+    color: var(--warning-orange);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+
+
+/* Empty state enhancement for better visual appeal */
+.text-center.text-muted.py-4 {
+    padding: 3rem 2rem !important;
+    background: linear-gradient(135deg, rgba(0, 166, 81, 0.1) 0%, rgba(255, 205, 17, 0.05) 100%);
+    border-radius: var(--border-radius);
+    border: 2px dashed rgba(0, 166, 81, 0.3);
+}
+
+.text-center.text-muted.py-4 i {
+    color: var(--safety-green) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    margin-bottom: 1rem !important;
+}
+
+.text-center.text-muted.py-4 p {
+    color: var(--safety-green) !important;
+    font-weight: 700 !important;
+    font-size: 1.1rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    margin: 0 !important;
+}
+
+/* CAT Buttons */
+.btn {
+    border-radius: var(--border-radius);
+    font-weight: 700;
+    padding: 0.75rem 1.5rem;
+    transition: var(--transition);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+    border: 2px solid transparent;
+    text-shadow: var(--text-shadow);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--industrial-blue) 0%, #003875 100%);
+    border-color: var(--industrial-blue);
+    color: white;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--safety-green) 0%, #008A43 100%);
+    border-color: var(--safety-green);
+    color: white;
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, var(--cat-yellow) 0%, var(--cat-orange) 100%);
+    border-color: var(--cat-yellow);
+    color: var(--cat-black);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--safety-red) 0%, #C71E20 100%);
+    border-color: var(--safety-red);
+    color: white;
+}
+
+/* CAT Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.stat-card:nth-child(1) { animation-delay: 0.1s; }
+.stat-card:nth-child(2) { animation-delay: 0.2s; }
+.stat-card:nth-child(3) { animation-delay: 0.3s; }
+.stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+.safety-alert-item {
+    animation: slideInRight 0.5s ease-out;
+}
+
+.task-item {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* Footer */
+footer {
+    background: linear-gradient(135deg, var(--cat-black) 0%, var(--cat-dark-gray) 100%);
+    border-top: 3px solid var(--cat-yellow);
+    color: var(--cat-text-gray);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 0 1rem;
+    }
+    
+    .stat-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .stat-card h2 {
+        font-size: 2.2rem;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .safety-alert-item,
+    .task-item,
+    .quick-action-btn {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-brand {
+        font-size: 1.3rem !important;
+    }
+    
+    .stat-card h2 {
+        font-size: 2rem;
+    }
+    
+    .stat-card h4 {
+        font-size: 0.9rem;
+    }
+}
+
+/* Dark mode optimization */
+@media (prefers-color-scheme: dark) {
+    /* Already optimized for dark theme */
+}
+
+
+

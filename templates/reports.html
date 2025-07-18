@@ -1,0 +1,405 @@
+{% extends "base.html" %}
+
+{% block title %}Reports & Analytics - Smart Operator Assistant{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <h1 class="h2 mb-4">
+            <i class="fas fa-chart-bar text-success me-2"></i>
+            Reports & Analytics
+        </h1>
+    </div>
+</div>
+
+<!-- Key Performance Indicators -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-3 col-md-6">
+        <div class="card stat-card bg-gradient-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title text-white">Avg Fuel Efficiency</h4>
+                        <h2 class="text-white">4.2L/hr</h2>
+                        <small class="text-white-50">Last 30 days</small>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-gas-pump"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card stat-card bg-gradient-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title text-white">Uptime</h4>
+                        <h2 class="text-white">94.2%</h2>
+                        <small class="text-white-50">Machine availability</small>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card stat-card bg-gradient-warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title text-white">Avg Load Cycles</h4>
+                        <h2 class="text-white">8.5</h2>
+                        <small class="text-white-50">Per hour</small>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card stat-card bg-gradient-info">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title text-white">Safety Score</h4>
+                        <h2 class="text-white">87%</h2>
+                        <small class="text-white-50">Compliance rate</small>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Machine Performance Chart -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Machine Performance Trends (Last 30 Days)
+                </h5>
+            </div>
+            <div class="card-body" style="height: 450px;">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Safety Incidents Breakdown -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Safety Incidents by Type
+                </h5>
+            </div>
+            <div class="card-body" style="height: 350px;">
+                <canvas id="incidentChart"></canvas>
+                
+                <div class="mt-4">
+                    <h6 class="text-muted">Incident Summary:</h6>
+                    {% if incident_stats %}
+                    <div class="list-group list-group-flush">
+                        {% for incident_type, count in incident_stats %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center py-2">
+                            <span>{{ incident_type }}</span>
+                            <span class="badge bg-warning rounded-pill">{{ count }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No incidents recorded</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Machine Performance Comparison -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-cogs me-2"></i>
+                    Machine Performance Comparison
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if performance_data %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Machine ID</th>
+                                <th>Avg Fuel Usage (L/hr)</th>
+                                <th>Avg Idling Time (min)</th>
+                                <th>Avg Load Cycles</th>
+                                <th>Efficiency Score</th>
+                                <th>Performance Trend</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for machine in performance_data %}
+                            {% set efficiency_score = ((10 - machine.avg_idling/10) + machine.avg_cycles) * 5 %}
+                            <tr>
+                                <td><strong>{{ machine.machine_id }}</strong></td>
+                                <td>
+                                    <span class="text-{{ 'success' if machine.avg_fuel < 5.0 else 'warning' if machine.avg_fuel < 7.0 else 'danger' }}">
+                                        {{ machine.avg_fuel }}L/hr
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="text-{{ 'success' if machine.avg_idling < 30 else 'warning' if machine.avg_idling < 45 else 'danger' }}">
+                                        {{ machine.avg_idling }} min
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="text-{{ 'success' if machine.avg_cycles > 8 else 'warning' if machine.avg_cycles > 5 else 'danger' }}">
+                                        {{ machine.avg_cycles }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress flex-grow-1 me-2" style="height: 20px;">
+                                            <div class="progress-bar bg-{{ 'success' if efficiency_score > 70 else 'warning' if efficiency_score > 50 else 'danger' }}" 
+                                                 style="width: {{ efficiency_score }}%">
+                                                {{ efficiency_score | round(0) }}%
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <canvas id="sparkline{{ loop.index }}" width="80" height="30"></canvas>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-chart-bar fa-3x mb-3"></i>
+                    <p>No performance data available</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Productivity Analysis -->
+<div class="row mt-4">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-area me-2"></i>
+                    Daily Productivity Trends
+                </h5>
+            </div>
+            <div class="card-body" style="height: 350px;">
+                <canvas id="productivityChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Performance trends chart
+const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+const performanceChart = new Chart(performanceCtx, {
+    type: 'line',
+    data: {
+        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+        datasets: [
+            {
+                label: 'Fuel Efficiency (L/hr)',
+                data: [4.5, 4.2, 4.0, 4.2],
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                tension: 0.4,
+                fill: true
+            },
+            {
+                label: 'Load Cycles/hr',
+                data: [7.5, 8.0, 8.5, 8.2],
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                tension: 0.4,
+                fill: true
+            },
+            {
+                label: 'Uptime %',
+                data: [92, 94, 95, 94],
+                borderColor: '#ffc107',
+                backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                tension: 0.4,
+                fill: true
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100
+            }
+        },
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        },
+        layout: {
+            padding: 10
+        }
+    }
+});
+
+// Safety incidents chart
+const incidentCtx = document.getElementById('incidentChart').getContext('2d');
+const incidentChart = new Chart(incidentCtx, {
+    type: 'doughnut',
+    data: {
+        labels: [
+            {% for incident_type, count in incident_stats %}
+            '{{ incident_type }}'{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ],
+        datasets: [{
+            data: [
+                {% for incident_type, count in incident_stats %}
+                {{ count }}{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            backgroundColor: ['#dc3545', '#ffc107', '#fd7e14', '#6f42c1', '#20c997'],
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    padding: 15,
+                    usePointStyle: true
+                }
+            }
+        },
+        layout: {
+            padding: 10
+        }
+    }
+});
+
+// Productivity chart
+const productivityCtx = document.getElementById('productivityChart').getContext('2d');
+const productivityChart = new Chart(productivityCtx, {
+    type: 'bar',
+    data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+            label: 'Tasks Completed',
+            data: [12, 15, 18, 14, 16, 8, 4],
+            backgroundColor: '#28a745',
+            borderRadius: 4
+        }, {
+            label: 'Hours Worked',
+            data: [8, 8.5, 9, 7.5, 8, 6, 3],
+            backgroundColor: '#007bff',
+            borderRadius: 4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 20
+            }
+        },
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        },
+        layout: {
+            padding: 10
+        }
+    }
+});
+
+// Generate sparkline charts for each machine
+{% for machine in performance_data %}
+const sparkCtx{{ loop.index }} = document.getElementById('sparkline{{ loop.index }}').getContext('2d');
+new Chart(sparkCtx{{ loop.index }}, {
+    type: 'line',
+    data: {
+        labels: ['', '', '', '', ''],
+        datasets: [{
+            data: [
+                {{ machine.avg_fuel * 0.9 }}, 
+                {{ machine.avg_fuel * 1.1 }}, 
+                {{ machine.avg_fuel * 0.95 }}, 
+                {{ machine.avg_fuel * 1.05 }}, 
+                {{ machine.avg_fuel }}
+            ],
+            borderColor: '{{ "#28a745" if machine.avg_fuel < 5.0 else "#ffc107" if machine.avg_fuel < 7.0 else "#dc3545" }}',
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: false,
+        maintainAspectRatio: false,
+        scales: {
+            x: { display: false },
+            y: { display: false }
+        },
+        plugins: {
+            legend: { display: false }
+        },
+        elements: {
+            point: { radius: 0 }
+        }
+    }
+});
+{% endfor %}
+
+
+
+// Auto-refresh charts every 5 minutes
+setInterval(function() {
+    // This would normally fetch new data and update charts
+    console.log('Refreshing chart data...');
+}, 300000);
+</script>
+{% endblock %}

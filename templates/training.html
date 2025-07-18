@@ -1,0 +1,511 @@
+{% extends "base.html" %}
+
+{% block title %}Training Hub - Smart Operator Assistant{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <h1 class="h2 mb-4">
+            <i class="fas fa-graduation-cap text-info me-2"></i>
+            Operator Training Hub
+        </h1>
+    </div>
+</div>
+
+<!-- Training Statistics -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-3 col-md-6">
+        <div class="card stat-card bg-gradient-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title text-white">Total Courses</h4>
+                        <h2 class="text-white">{{ total_courses }}</h2>
+                        <small class="text-white-50">All assigned courses</small>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card stat-card bg-gradient-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title text-white">Completed</h4>
+                        <h2 class="text-white">{{ completed_courses }}</h2>
+                        <small class="text-white-50">{{ ((completed_courses / total_courses) * 100) | round(1) if total_courses > 0 else 0 }}% completion rate</small>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card stat-card bg-gradient-warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title text-white">Overdue</h4>
+                        <h2 class="text-white">{{ overdue_courses }}</h2>
+                        <small class="text-white-50">Require attention</small>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card stat-card bg-gradient-info">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title text-white">Due Soon</h4>
+                        <h2 class="text-white">{{ upcoming_training|length }}</h2>
+                        <small class="text-white-50">Next 7 days</small>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Upcoming Training -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    Upcoming Training (Next 7 Days)
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if upcoming_training %}
+                <div class="list-group list-group-flush">
+                    {% for training in upcoming_training %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ training.course_name }}</strong>
+                            <br>
+                            <small class="text-muted">
+                                <i class="fas fa-user me-1"></i>{{ training.operator_id }}
+                                <span class="ms-2">
+                                    <i class="fas fa-tag me-1"></i>{{ training.course_type }}
+                                </span>
+                            </small>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-{{ 'danger' if (training.due_date - date.today()).days <= 2 else 'warning' }}">
+                                Due {{ training.due_date.strftime('%m/%d') }}
+                            </span>
+                            <br>
+                            <small class="text-muted">
+                                {{ (training.due_date - date.today()).days }} days
+                            </small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-calendar-check fa-3x mb-3 text-success"></i>
+                    <p>No upcoming training due!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Training Progress Chart -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Training Progress by Type
+                </h5>
+            </div>
+            <div class="card-body" style="height: 350px;">
+                <canvas id="trainingChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Training Records Section -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-{{ 'user-graduate' if operators|length == 1 else 'users' }} me-2"></i>
+                    {% if operators|length == 1 %}My Training Records{% else %}Operator Training Records{% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if operators|length == 1 %}
+                <!-- Operator View - Show all training records in detail -->
+                {% set operator = operators[0] %}
+                {% if training_records %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Course Name</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Assigned Date</th>
+                                <th>Due Date</th>
+                                <th>Estimated Time</th>
+                                <th>Progress</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for training in training_records %}
+                            <tr class="training-row">
+                                <td>
+                                    <strong>{{ training.course_name }}</strong>
+                                    {% if training.status == 'Completed' and training.completion_date %}
+                                    <br><small class="text-success">
+                                        <i class="fas fa-check-circle me-1"></i>
+                                        Completed {{ training.completion_date.strftime('%m/%d/%Y') }}
+                                    </small>
+                                    {% elif training.status == 'In Progress' %}
+                                    <br><small class="text-warning">
+                                        <i class="fas fa-play-circle me-1"></i>
+                                        Started {{ training.created_at.strftime('%m/%d/%Y') }}
+                                    </small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'info' if training.course_type == 'Safety' else 'warning' if training.course_type == 'Technical' else 'primary' }}">
+                                        {{ training.course_type }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if training.status == 'Completed' else 'warning' if training.status == 'In Progress' else 'secondary' }}">
+                                        {% if training.status == 'Completed' %}
+                                        <i class="fas fa-check me-1"></i>
+                                        {% elif training.status == 'In Progress' %}
+                                        <i class="fas fa-spinner me-1"></i>
+                                        {% else %}
+                                        <i class="fas fa-clock me-1"></i>
+                                        {% endif %}
+                                        {{ training.status }}
+                                    </span>
+                                </td>
+                                <td>{{ training.created_at.strftime('%m/%d/%Y') }}</td>
+                                <td>
+                                    {% if training.due_date %}
+                                    {{ training.due_date.strftime('%m/%d/%Y') }}
+                                    {% if training.due_date < date.today() and training.status != 'Completed' %}
+                                    <br><small class="text-danger">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>Overdue
+                                    </small>
+                                    {% elif training.due_date <= (date.today() + timedelta(days=7)) and training.status != 'Completed' %}
+                                    <br><small class="text-warning">
+                                        <i class="fas fa-clock me-1"></i>Due soon
+                                    </small>
+                                    {% endif %}
+                                    {% else %}
+                                    <span class="text-muted">No deadline</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if training.estimated_time %}
+                                    <strong>{{ training.estimated_time }}</strong> minutes
+                                    {% else %}
+                                    <span class="text-muted">Not specified</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if training.status == 'Completed' %}
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-success" style="width: 100%"></div>
+                                    </div>
+                                    <small class="text-success">100% Complete</small>
+                                    {% elif training.status == 'In Progress' %}
+                                    {% set progress = 50 %}
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-warning" style="width: {{ progress }}%"></div>
+                                    </div>
+                                    <small class="text-warning">{{ progress }}% Complete</small>
+                                    {% else %}
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-secondary" style="width: 0%"></div>
+                                    </div>
+                                    <small class="text-muted">Not started</small>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-5">
+                    <i class="fas fa-graduation-cap fa-4x mb-3"></i>
+                    <h5>No Training Records</h5>
+                    <p>You haven't been assigned any training courses yet.</p>
+                </div>
+                {% endif %}
+                {% else %}
+                <!-- Manager View - Show operator cards with View Details buttons -->
+                <div class="row">
+                    {% for operator in operators %}
+                    <div class="col-lg-6 col-xl-4 mb-4">
+                        <div class="card operator-card">
+                            <div class="card-header bg-light">
+                                <h6 class="card-title mb-0">
+                                    <i class="fas fa-user me-2"></i>
+                                    {{ operator.name }}
+                                </h6>
+                                <small class="text-muted">ID: {{ operator.id }} | Level: {{ operator.certification_level }}</small>
+                            </div>
+                            <div class="card-body">
+                                {% set operator_training = operator.training_records %}
+                                {% if operator_training %}
+                                <div class="training-summary mb-3">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Completed:</span>
+                                        <strong class="text-success">{{ operator_training | selectattr('status', 'equalto', 'Completed') | list | length }}</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>In Progress:</span>
+                                        <strong class="text-warning">{{ operator_training | selectattr('status', 'equalto', 'In Progress') | list | length }}</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Assigned:</span>
+                                        <strong class="text-info">{{ operator_training | selectattr('status', 'equalto', 'Assigned') | list | length }}</strong>
+                                    </div>
+                                </div>
+
+                                <div class="recent-courses">
+                                    <h6 class="small text-muted mb-2">Recent Courses:</h6>
+                                    {% for training in operator_training[:3] %}
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <div>
+                                            <small>{{ training.course_name[:25] }}{% if training.course_name|length > 25 %}...{% endif %}</small>
+                                            <br>
+                                            <small class="text-muted">{{ training.course_type }}</small>
+                                        </div>
+                                        <span class="badge bg-{{ 'success' if training.status == 'Completed' else 'warning' if training.status == 'In Progress' else 'secondary' }} badge-sm">
+                                            {{ training.status }}
+                                        </span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <div class="text-center text-muted py-3">
+                                    <i class="fas fa-graduation-cap fa-2x mb-2"></i>
+                                    <p class="small">No training assigned</p>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Chart.js for training statistics -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Enhanced Training Page JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Training page loaded');
+    
+    // Initialize training chart if element exists
+    const chartElement = document.getElementById('trainingChart');
+    if (chartElement) {
+        initializeTrainingChart();
+    }
+    
+    // Add enhanced styling and interactions for training rows
+    enhanceTrainingTable();
+});
+
+function initializeTrainingChart() {
+    try {
+        const ctx = document.getElementById('trainingChart').getContext('2d');
+        const trainingChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Safety', 'Technical', 'Certification'],
+                datasets: [
+                    {
+                        label: 'Completed',
+                        data: [12, 8, 4],
+                        backgroundColor: '#28a745',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'In Progress',
+                        data: [3, 5, 2],
+                        backgroundColor: '#ffc107',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Assigned',
+                        data: [2, 3, 1],
+                        backgroundColor: '#6c757d',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        stepSize: 1,
+                        max: 15
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                layout: {
+                    padding: 10
+                }
+            }
+        });
+        console.log('Training chart initialized successfully');
+    } catch (error) {
+        console.error('Error initializing training chart:', error);
+    }
+}
+
+function enhanceTrainingTable() {
+    // Add hover effects and click interactions for training rows
+    const trainingRows = document.querySelectorAll('.training-row');
+    trainingRows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = '#f8f9fa';
+            this.style.cursor = 'pointer';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+        });
+        
+        // Add click to expand functionality (future enhancement)
+        row.addEventListener('click', function() {
+            console.log('Training row clicked - could expand for more details');
+        });
+    });
+}
+
+// Set current date for due date calculations
+const date = {
+    today: () => new Date()
+};
+</script>
+
+<style>
+/* Enhanced Training Table Styling */
+.training-row {
+    transition: all 0.2s ease;
+}
+
+.training-row:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.table-responsive {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.table thead th {
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.progress {
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.badge {
+    font-size: 0.75em;
+    letter-spacing: 0.3px;
+}
+
+/* Status-specific styling */
+.training-row td:first-child {
+    font-weight: 500;
+}
+
+/* Progress bar animations */
+.progress-bar {
+    transition: width 1s ease-in-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.9em;
+    }
+    
+    .training-row small {
+        font-size: 0.75em;
+    }
+}
+
+/* CAT Yellow highlight for overdue items */
+.text-danger {
+    color: #dc3545 !important;
+    font-weight: 600;
+}
+
+.text-warning {
+    color: #ffc107 !important;
+    font-weight: 500;
+}
+
+/* Operator card enhancements */
+.operator-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.operator-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+</style>
+{% endblock %}

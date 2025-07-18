@@ -1,0 +1,400 @@
+{% extends "base.html" %}
+
+{% block title %}Task Management - Smart Operator Assistant{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <h1 class="h2 mb-4">
+            <i class="fas fa-tasks text-primary me-2"></i>
+            Task Management
+        </h1>
+    </div>
+</div>
+
+<!-- Task Statistics -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-3 col-md-6">
+        <div class="card stat-card bg-gradient-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title text-white">Total Tasks</h4>
+                        <h2 class="text-white">{{ total_tasks }}</h2>
+                        <small class="text-white-50">All time</small>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card stat-card bg-gradient-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title text-white">Completed</h4>
+                        <h2 class="text-white">{{ completed_tasks }}</h2>
+                        <small class="text-white-50">{{ ((completed_tasks / total_tasks) * 100) | round(1) if total_tasks > 0 else 0 }}% completion rate</small>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card stat-card bg-gradient-warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title text-white">In Progress</h4>
+                        <h2 class="text-white">{{ in_progress_tasks }}</h2>
+                        <small class="text-white-50">Currently active</small>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card stat-card bg-gradient-info">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title text-white">Pending</h4>
+                        <h2 class="text-white">{{ pending_tasks }}</h2>
+                        <small class="text-white-50">Awaiting start</small>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Task Management Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        {% if current_user.role in ['manager', 'admin'] %}
+        <div class="text-end">
+            <a href="{{ url_for('create_task') }}" class="btn btn-success btn-lg">
+                <i class="fas fa-plus me-2"></i>Create New Task
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Tasks Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    Tasks List
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if tasks %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Task</th>
+                                <th>Machine</th>
+                                <th>Operator</th>
+                                <th>Scheduled Date</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Duration</th>
+                                {% if current_user.role == 'operator' %}
+                                <th>Actions</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in tasks %}
+                            <tr class="task-row priority-{{ task.priority.lower() }}" 
+                                style="{% if task.priority == 'High' %}background-color: rgba(220, 53, 69, 0.05);{% elif task.priority == 'Medium' %}background-color: rgba(255, 193, 7, 0.05);{% else %}background-color: rgba(13, 202, 240, 0.05);{% endif %}">
+                                <td>
+                                    <strong>{{ task.title }}</strong>
+                                    {% if task.description %}
+                                    <br><small class="text-muted">{{ task.description[:50] }}{% if task.description|length > 50 %}...{% endif %}</small>
+                                    {% endif %}
+                                </td>
+                                <td><strong style="color: black;">{{ task.machine_id }}</strong></td>
+                                <td>{{ task.operator_id }}</td>
+                                <td>{{ task.scheduled_date.strftime('%m/%d/%Y') }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'danger' if task.priority == 'High' else 'warning' if task.priority == 'Medium' else 'info' }}">
+                                        {% if task.priority == 'High' %}
+                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                        {% elif task.priority == 'Medium' %}
+                                        <i class="fas fa-minus-circle me-1"></i>
+                                        {% else %}
+                                        <i class="fas fa-arrow-down me-1"></i>
+                                        {% endif %}
+                                        {{ task.priority }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if task.status == 'Completed' else 'warning' if task.status == 'In Progress' else 'secondary' }}">
+                                        {{ task.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <small class="text-muted">Est:</small> {{ task.estimated_duration }}min
+                                    {% if task.actual_duration %}
+                                    <br><small class="text-muted">Act:</small> {{ task.actual_duration }}min
+                                    {% endif %}
+                                </td>
+                                {% if current_user.role == 'operator' %}
+                                <td>
+                                            {% if task.status == 'Pending' %}
+                                                <form method="POST" action="{{ url_for('update_task_status', task_id=task.id) }}" class="d-inline">
+                                                    <input type="hidden" name="status" value="In Progress">
+                                            <button type="submit" class="btn btn-sm btn-success">
+                                                <i class="fas fa-play me-1"></i>Start
+                                                    </button>
+                                                </form>
+                                    {% elif task.status == 'In Progress' %}
+                                                <form method="POST" action="{{ url_for('update_task_status', task_id=task.id) }}" class="d-inline">
+                                                    <input type="hidden" name="status" value="Completed">
+                                            <button type="submit" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-check me-1"></i>Complete
+                                                    </button>
+                                                </form>
+                                    {% else %}
+                                        <span class="text-success">
+                                            <i class="fas fa-check-circle me-1"></i>Completed
+                                        </span>
+                                    {% endif %}
+                                    <button class="btn btn-sm btn-outline-info ms-1" data-bs-toggle="modal" data-bs-target="#taskModal{{ task.id }}">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                                {% endif %}
+                            </tr>
+
+                            <!-- Task Detail Modal -->
+                            <div class="modal fade" id="taskModal{{ task.id }}" tabindex="-1">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-primary text-white">
+                                            <h5 class="modal-title">Task Details</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <strong>Task Title:</strong><br>
+                                                    {{ task.title }}
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <strong>Status:</strong><br>
+                                                    <span class="badge bg-{{ 'success' if task.status == 'Completed' else 'warning' if task.status == 'In Progress' else 'secondary' }}">
+                                                        {{ task.status }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <strong>Machine:</strong><br>
+                                                    {{ task.machine_id }}
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <strong>Operator:</strong><br>
+                                                    {{ task.operator_id }}
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <strong>Scheduled Date:</strong><br>
+                                                    {{ task.scheduled_date.strftime('%B %d, %Y') }}
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <strong>Priority:</strong><br>
+                                                    <span class="badge bg-{{ 'danger' if task.priority == 'High' else 'warning' if task.priority == 'Medium' else 'info' }}">
+                                                        {{ task.priority }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            {% if task.description %}
+                                            <div>
+                                                <strong>Description:</strong><br>
+                                                {{ task.description }}
+                                            </div>
+                                            <hr>
+                                            {% endif %}
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <strong>Estimated Duration:</strong><br>
+                                                    {{ task.estimated_duration }} minutes
+                                                </div>
+                                                {% if task.actual_duration %}
+                                                <div class="col-md-6">
+                                                    <strong>Actual Duration:</strong><br>
+                                                    {{ task.actual_duration }} minutes
+                                                    {% if task.estimated_duration %}
+                                                    <br><small class="text-{{ 'success' if task.actual_duration <= task.estimated_duration else 'warning' }}">
+                                                        {{ '+' if task.actual_duration > task.estimated_duration else '' }}{{ task.actual_duration - task.estimated_duration }} min from estimate
+                                                    </small>
+                                                    {% endif %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            {% if task.completed_at %}
+                                            <hr>
+                                            <div>
+                                                <strong>Completed At:</strong><br>
+                                                {{ task.completed_at.strftime('%B %d, %Y at %H:%M') }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-tasks fa-3x mb-3"></i>
+                    <h5>No Tasks Available</h5>
+                    <p>{% if current_user.role == 'operator' %}You have no tasks assigned at the moment.{% else %}No tasks have been created yet.{% endif %}</p>
+                    {% if current_user.role in ['manager', 'admin'] %}
+                    <a href="{{ url_for('create_task') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Create First Task
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Enhanced Task Management JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Task management page loaded');
+    
+    // Initialize task functionality
+    initializeTaskModals();
+    initializeTaskActions();
+    initializeTaskUpdates();
+    
+    // Auto-refresh task status every 30 seconds
+    setInterval(function() {
+        console.log('Checking for task updates...');
+        // In a real implementation, this would fetch updates via AJAX
+    }, 30000);
+});
+
+function initializeTaskModals() {
+    // Ensure all modal triggers are working
+    const modalTriggers = document.querySelectorAll('[data-bs-toggle="modal"]');
+    console.log(`Found ${modalTriggers.length} modal triggers`);
+    
+    modalTriggers.forEach(trigger => {
+        trigger.addEventListener('click', function(e) {
+            console.log('Modal trigger clicked:', this.getAttribute('data-bs-target'));
+            
+            // Ensure Bootstrap modal is initialized
+            const targetId = this.getAttribute('data-bs-target');
+            const modalElement = document.querySelector(targetId);
+            
+            if (modalElement) {
+                // Force Bootstrap modal initialization if needed
+                if (!modalElement._modal) {
+                    modalElement._modal = new bootstrap.Modal(modalElement);
+                }
+                console.log('Modal initialized for:', targetId);
+            } else {
+                console.error('Modal element not found:', targetId);
+            }
+        });
+    });
+}
+
+function initializeTaskActions() {
+    // Task completion confirmation
+    const completeButtons = document.querySelectorAll('form[action*="update_task_status"] input[value="Completed"]');
+    console.log(`Found ${completeButtons.length} complete buttons`);
+    
+    completeButtons.forEach(button => {
+        button.closest('form').addEventListener('submit', function(e) {
+            if (!confirm('Mark this task as completed?')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    });
+    
+    // Status change confirmations
+    const statusForms = document.querySelectorAll('form[action*="update_task_status"]');
+    statusForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const statusInput = form.querySelector('input[name="status"]');
+            if (statusInput && statusInput.value === 'In Progress') {
+                if (!confirm('Start working on this task?')) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+        });
+    });
+}
+
+function initializeTaskUpdates() {
+    // Add visual feedback for task actions
+    const actionButtons = document.querySelectorAll('.dropdown-item, .btn');
+    actionButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Add loading state if it's a form submission
+            const form = this.closest('form');
+            if (form) {
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            }
+        });
+    });
+}
+
+// Debug function to test modal functionality
+function testModals() {
+    const modals = document.querySelectorAll('.modal');
+    console.log(`Testing ${modals.length} modals:`);
+    
+    modals.forEach((modal, index) => {
+        console.log(`Modal ${index + 1}:`, modal.id);
+        const modalInstance = new bootstrap.Modal(modal);
+        console.log('Modal instance created successfully');
+    });
+}
+
+// Make test function available globally for debugging
+window.testModals = testModals;
+</script>
+{% endblock %}

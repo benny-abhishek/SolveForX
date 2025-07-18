@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Create Task - Smart Operator Assistant{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="h2 mb-0">
+                <i class="fas fa-plus-circle text-primary me-2"></i>
+                Create New Task
+            </h1>
+            <a href="{{ url_for('task_management') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Back to Tasks
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-clipboard-list me-2"></i>
+                    Task Details
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('create_task') }}">
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="title" class="form-label">Task Title</label>
+                            <input type="text" class="form-control" id="title" name="title" required 
+                                   placeholder="e.g., Excavation - North Wall">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="machine_id" class="form-label">Machine</label>
+                            <select class="form-select" id="machine_id" name="machine_id" required onchange="updateOperator()">
+                                <option value="">Select Machine</option>
+                                {% for machine in machines %}
+                                <option value="{{ machine.id }}">{{ machine.id }} - {{ machine.model }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="operator_id" class="form-label">Operator</label>
+                            <select class="form-select" id="operator_id" name="operator_id" required>
+                                <option value="">Select Operator</option>
+                                {% for operator in operators %}
+                                <option value="{{ operator.id }}" data-machine="{{ operator.machine_id }}">
+                                    {{ operator.id }} - {{ operator.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="scheduled_date" class="form-label">Scheduled Date</label>
+                            <input type="date" class="form-control" id="scheduled_date" name="scheduled_date" 
+                                   value="{{ date.today().isoformat() }}" required>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="estimated_duration" class="form-label">Estimated Duration (minutes)</label>
+                            <input type="number" class="form-control" id="estimated_duration" name="estimated_duration" 
+                                   value="120" min="15" max="600" required>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="priority" class="form-label">Priority</label>
+                            <select class="form-select" id="priority" name="priority" required>
+                                <option value="Low">Low</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="description" class="form-label">Task Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="4" 
+                                  placeholder="Detailed description of the task, including specific requirements, safety considerations, and expected outcomes..."></textarea>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary me-2" onclick="window.history.back()">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check me-1"></i>Create Task
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Task Creation Tips -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    Task Creation Tips
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6 class="text-warning"><i class="fas fa-star me-1"></i>Priority Guidelines</h6>
+                    <ul class="small mb-0">
+                        <li><strong>High:</strong> Safety-critical, time-sensitive</li>
+                        <li><strong>Medium:</strong> Important but flexible timing</li>
+                        <li><strong>Low:</strong> Routine maintenance, cleanup</li>
+                    </ul>
+                </div>
+                
+                <div class="mb-3">
+                    <h6 class="text-success"><i class="fas fa-clock me-1"></i>Duration Estimates</h6>
+                    <ul class="small mb-0">
+                        <li><strong>Inspection:</strong> 15-60 minutes</li>
+                        <li><strong>Loading/Unloading:</strong> 60-180 minutes</li>
+                        <li><strong>Excavation:</strong> 120-360 minutes</li>
+                        <li><strong>Maintenance:</strong> 30-120 minutes</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h6 class="text-primary"><i class="fas fa-shield-alt me-1"></i>Safety Reminders</h6>
+                    <ul class="small mb-0">
+                        <li>Include safety requirements in description</li>
+                        <li>Consider weather and site conditions</li>
+                        <li>Verify operator certification level</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Task Templates -->
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-magic me-2"></i>
+                    Quick Templates
+                </h5>
+            </div>
+            <div class="card-body">
+                <button type="button" class="btn btn-outline-primary btn-sm w-100 mb-2" 
+                        onclick="fillTemplate('inspection')">
+                    <i class="fas fa-search me-1"></i>Daily Inspection
+                </button>
+                <button type="button" class="btn btn-outline-warning btn-sm w-100 mb-2" 
+                        onclick="fillTemplate('excavation')">
+                    <i class="fas fa-hammer me-1"></i>Excavation Work
+                </button>
+                <button type="button" class="btn btn-outline-info btn-sm w-100 mb-2" 
+                        onclick="fillTemplate('loading')">
+                    <i class="fas fa-truck-loading me-1"></i>Material Loading
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm w-100" 
+                        onclick="fillTemplate('maintenance')">
+                    <i class="fas fa-wrench me-1"></i>Maintenance
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Update operator dropdown based on selected machine
+function updateOperator() {
+    const machineSelect = document.getElementById('machine_id');
+    const operatorSelect = document.getElementById('operator_id');
+    const selectedMachine = machineSelect.value;
+    
+    // Reset operator selection
+    operatorSelect.value = '';
+    
+    // Show only operators assigned to selected machine
+    const operatorOptions = operatorSelect.getElementsByTagName('option');
+    for (let i = 1; i < operatorOptions.length; i++) { // Skip first "Select Operator" option
+        const option = operatorOptions[i];
+        const operatorMachine = option.getAttribute('data-machine');
+        
+        if (selectedMachine === '' || operatorMachine === selectedMachine) {
+            option.style.display = 'block';
+            if (operatorMachine === selectedMachine) {
+                option.selected = true; // Auto-select the machine's operator
+            }
+        } else {
+            option.style.display = 'none';
+        }
+    }
+}
+
+// Fill form with task templates
+function fillTemplate(templateType) {
+    const templates = {
+        inspection: {
+            title: 'Daily Equipment Safety Inspection',
+            description: 'Perform comprehensive safety inspection including:\n- Engine fluids and filters\n- Hydraulic system check\n- Safety devices and alarms\n- Structural integrity assessment\n- Record findings in inspection log',
+            duration: 30,
+            priority: 'High'
+        },
+        excavation: {
+            title: 'Excavation Work - Foundation Area',
+            description: 'Excavate designated area for foundation work:\n- Follow site plan and elevation markers\n- Maintain proper slope angles for safety\n- Coordinate with survey team for depth verification\n- Ensure proper spoil placement',
+            duration: 240,
+            priority: 'High'
+        },
+        loading: {
+            title: 'Material Loading Operations',
+            description: 'Load materials onto trucks for transport:\n- Verify load capacity and distribution\n- Coordinate with truck drivers\n- Follow loading sequence protocol\n- Maintain clear communication during operation',
+            duration: 120,
+            priority: 'Medium'
+        },
+        maintenance: {
+            title: 'Routine Equipment Maintenance',
+            description: 'Perform scheduled maintenance tasks:\n- Check and top off fluids\n- Lubricate grease points\n- Inspect wear components\n- Clean air filters and screens\n- Document maintenance performed',
+            duration: 90,
+            priority: 'Medium'
+        }
+    };
+    
+    const template = templates[templateType];
+    if (template) {
+        document.getElementById('title').value = template.title;
+        document.getElementById('description').value = template.description;
+        document.getElementById('estimated_duration').value = template.duration;
+        document.getElementById('priority').value = template.priority;
+    }
+}
+
+// Set minimum date to today
+document.addEventListener('DOMContentLoaded', function() {
+    const dateInput = document.getElementById('scheduled_date');
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.setAttribute('min', today);
+});
+</script>
+{% endblock %} 
