@@ -215,6 +215,7 @@ def task_management():
 @login_required
 def update_task_status(task_id):
     """Update task status"""
+    print(f"Task status update requested for task {task_id}")
     task = Task.query.get_or_404(task_id)
     
     # Check if user can update this task
@@ -225,12 +226,18 @@ def update_task_status(task_id):
             return redirect(url_for('task_management'))
     
     new_status = request.form.get('status')
+    print(f"Updating task {task_id} status from '{task.status}' to '{new_status}'")
+    
     if new_status in ['Pending', 'In Progress', 'Completed']:
         task.status = new_status
         if new_status == 'Completed':
             task.completed_at = datetime.utcnow()
         db.session.commit()
+        print(f"Task {task_id} status successfully updated to {new_status}")
         flash(f'Task status updated to {new_status}', 'success')
+    else:
+        print(f"Invalid status '{new_status}' provided for task {task_id}")
+        flash(f'Invalid status: {new_status}', 'error')
     
     return redirect(url_for('task_management'))
 

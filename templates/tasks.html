@@ -295,6 +295,27 @@
 {% endblock %}
 
 {% block scripts %}
+<style>
+/* Ensure modals display properly */
+.modal {
+    z-index: 1050;
+}
+
+.modal-backdrop {
+    z-index: 1040;
+}
+
+/* Fallback modal styles */
+.modal.show {
+    display: block !important;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-open {
+    overflow: hidden;
+}
+</style>
+
 <script>
 // Enhanced Task Management JavaScript
 document.addEventListener('DOMContentLoaded', function() {
@@ -305,12 +326,61 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeTaskActions();
     initializeTaskUpdates();
     
+    // Test modal functionality
+    testModalFunctionality();
+    
     // Auto-refresh task status every 30 seconds
     setInterval(function() {
         console.log('Checking for task updates...');
         // In a real implementation, this would fetch updates via AJAX
     }, 30000);
 });
+
+function testModalFunctionality() {
+    console.log('Testing modal functionality...');
+    const modals = document.querySelectorAll('.modal');
+    const triggers = document.querySelectorAll('[data-bs-toggle="modal"]');
+    
+    console.log(`Found ${modals.length} modals and ${triggers.length} triggers`);
+    
+    modals.forEach((modal, index) => {
+        console.log(`Modal ${index + 1}:`, modal.id, 'Display:', modal.style.display);
+    });
+    
+    triggers.forEach((trigger, index) => {
+        console.log(`Trigger ${index + 1}:`, trigger.getAttribute('data-bs-target'));
+    });
+    
+    // Add a test button to manually trigger the first modal
+    if (modals.length > 0 && triggers.length > 0) {
+        const testButton = document.createElement('button');
+        testButton.textContent = 'Test Modal';
+        testButton.className = 'btn btn-warning btn-sm ms-2';
+        testButton.onclick = function() {
+            console.log('Test button clicked');
+            const firstModal = modals[0];
+            const firstTrigger = triggers[0];
+            console.log('Testing modal:', firstModal.id);
+            console.log('Testing trigger:', firstTrigger.getAttribute('data-bs-target'));
+            
+            // Try to show the modal
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                const modal = new bootstrap.Modal(firstModal);
+                modal.show();
+            } else {
+                firstModal.style.display = 'block';
+                firstModal.classList.add('show');
+                document.body.classList.add('modal-open');
+            }
+        };
+        
+        // Add the test button to the page
+        const container = document.querySelector('.container-fluid');
+        if (container) {
+            container.insertBefore(testButton, container.firstChild);
+        }
+    }
+}
 
 function initializeTaskModals() {
     // Ensure all modal triggers are working
@@ -319,20 +389,50 @@ function initializeTaskModals() {
     
     modalTriggers.forEach(trigger => {
         trigger.addEventListener('click', function(e) {
-            console.log('Modal trigger clicked:', this.getAttribute('data-bs-target'));
+            e.preventDefault();
+            const targetId = this.getAttribute('data-bs-target');
+            console.log('Modal trigger clicked:', targetId);
             
             // Ensure Bootstrap modal is initialized
-            const targetId = this.getAttribute('data-bs-target');
             const modalElement = document.querySelector(targetId);
             
             if (modalElement) {
-                // Force Bootstrap modal initialization if needed
-                if (!modalElement._modal) {
-                    modalElement._modal = new bootstrap.Modal(modalElement);
+                try {
+                    // Check if Bootstrap is available
+                    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                        // Create new modal instance
+                        const modal = new bootstrap.Modal(modalElement);
+                        modal.show();
+                        console.log('Modal shown successfully for:', targetId);
+                    } else {
+                        console.error('Bootstrap Modal not available');
+                        // Fallback: show modal manually
+                        modalElement.style.display = 'block';
+                        modalElement.classList.add('show');
+                        document.body.classList.add('modal-open');
+                    }
+                } catch (error) {
+                    console.error('Error showing modal:', error);
+                    // Fallback: show modal manually
+                    modalElement.style.display = 'block';
+                    modalElement.classList.add('show');
+                    document.body.classList.add('modal-open');
                 }
-                console.log('Modal initialized for:', targetId);
             } else {
                 console.error('Modal element not found:', targetId);
+            }
+        });
+    });
+    
+    // Add close functionality for fallback
+    const closeButtons = document.querySelectorAll('.btn-close, .btn-secondary');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.remove('show');
+                document.body.classList.remove('modal-open');
             }
         });
     });
@@ -345,41 +445,53 @@ function initializeTaskActions() {
     
     completeButtons.forEach(button => {
         button.closest('form').addEventListener('submit', function(e) {
+            console.log('Complete button clicked, showing confirmation...');
             if (!confirm('Mark this task as completed?')) {
                 e.preventDefault();
                 return false;
             }
+            console.log('Task completion confirmed, submitting form...');
         });
     });
     
     // Status change confirmations
     const statusForms = document.querySelectorAll('form[action*="update_task_status"]');
+    console.log(`Found ${statusForms.length} task status update forms`);
+    
     statusForms.forEach(form => {
         form.addEventListener('submit', function(e) {
             const statusInput = form.querySelector('input[name="status"]');
+            console.log('Task status form submitted:', statusInput ? statusInput.value : 'no status input found');
+            
             if (statusInput && statusInput.value === 'In Progress') {
+                console.log('Start button clicked, showing confirmation...');
                 if (!confirm('Start working on this task?')) {
                     e.preventDefault();
                     return false;
                 }
+                console.log('Starting task confirmed, submitting form...');
             }
+        });
+    });
+    
+    // Add direct click listeners to buttons for debugging
+    const startButtons = document.querySelectorAll('form[action*="update_task_status"] button[type="submit"]');
+    console.log(`Found ${startButtons.length} task action buttons`);
+    
+    startButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            console.log('Task action button clicked:', this.textContent.trim());
+            const form = this.closest('form');
+            const statusInput = form.querySelector('input[name="status"]');
+            console.log('Button will submit status:', statusInput ? statusInput.value : 'no status found');
         });
     });
 }
 
 function initializeTaskUpdates() {
-    // Add visual feedback for task actions
-    const actionButtons = document.querySelectorAll('.dropdown-item, .btn');
-    actionButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // Add loading state if it's a form submission
-            const form = this.closest('form');
-            if (form) {
-                this.disabled = true;
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-            }
-        });
-    });
+    // Removed loading state interference for task status updates
+    // Task status updates should work without any visual interference
+    console.log('Task updates initialized - no interference with status updates');
 }
 
 // Debug function to test modal functionality
